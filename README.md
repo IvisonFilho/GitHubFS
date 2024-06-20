@@ -1,7 +1,7 @@
 # GitHubFS
 GitHubFS: Sistema de Arquivos em Modo Usuário com Crate FUSE para GitHub
 
-#About
+# About
 
 FUSE-Rust é uma biblioteca crate Rust para implementação fácil de sistemas de arquivos FUSE em modo usuário.
 
@@ -9,7 +9,7 @@ FUSE-Rust não apenas fornece bindings, é uma reescrita da biblioteca FUSE orig
 
 Esta biblioteca foi originalmente derivada da crate fuse com a intenção de continuar o desenvolvimento, especialmente adicionando funcionalidades de ABIs após a versão 7.19.
 
-#Detalhes sobre FUSE e FUSE-Rust
+# Detalhes sobre FUSE e FUSE-Rust
 
 Um sistema de arquivos FUSE consiste em três partes essenciais:
 
