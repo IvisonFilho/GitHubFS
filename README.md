@@ -21,7 +21,7 @@ Um sistema de arquivos FUSE consiste em três partes essenciais:
 
 O projeto FUSE fornece o driver do kernel, enquanto a biblioteca libfuse é comumente usada para facilitar a comunicação entre o driver do kernel e o processo de espaço de usuário. No entanto, FUSE-Rust oferece uma abordagem diferente ao fornecer uma substituição para libfuse, toda escrita em Rust.
 
-FUSE-Rust:
+# FUSE-Rust 
 
 Substituição de libfuse: FUSE-Rust se posiciona entre o driver do kernel e a implementação de espaço de usuário, permitindo que desenvolvedores construam sistemas de arquivos FUSE diretamente em Rust. Isso possibilita aproveitar completamente a interface de tipos e os recursos de tempo de execução oferecidos por Rust.
 
