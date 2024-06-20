@@ -1,0 +1,7 @@
+[package]
+name = "GitHubFS"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fuser = "0.14.0"
