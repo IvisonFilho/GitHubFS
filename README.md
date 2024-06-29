@@ -28,3 +28,21 @@ Substituição de libfuse: FUSE-Rust se posiciona entre o driver do kernel e a i
 Menos dependência de libfuse: Exceto por duas funções específicas - uma para configurar (montar) o sistema de arquivos FUSE e outra para desmontá-lo - que ainda dependem de libfuse, todas as operações principais são executadas em Rust. Em ambientes Linux, essas chamadas para libfuse podem ser opcionalmente removidas compilando sem o recurso "libfuse".
 
 Essa abordagem com FUSE-Rust não apenas aproveita as capacidades avançadas de Rust, mas também oferece uma maneira mais integrada e autônoma de desenvolver sistemas de arquivos FUSE, mantendo a flexibilidade de usar partes da libfuse quando necessário.
+
+
+# RODAR:
+
+1 - sudo mkdir /mnt/githubfs: Cria um diretório vazio chamado githubfs em /mnt, onde o sistema de arquivos GitHubFS pode ser montado novamente.
+
+2 - Cargo build : Compilar 
+
+2 - ./target/debug/GitHubFS OWNER REPO: executar o binário GitHubFS compilado a partir do diretório target/debug/ com argumentos, para iniciar o seu sistema de arquivos GitHubFS com os parâmetros de usuário e nome do repositório.
+
+Caso funcione na primeira vez e na próximas não , tente:
+
+sudo umount /mnt/githubfs: Desmonta o sistema de arquivos GitHubFS que estava montado em /mnt/githubfs.
+
+sudo rm -rf /mnt/githubfs/: Remove recursivamente e força a remoção de todos os arquivos e diretórios dentro de /mnt/githubfs/.
+
+Agora tente novamente os passoas 1 , 2 e 3.
+
