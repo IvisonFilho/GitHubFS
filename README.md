@@ -34,9 +34,9 @@ Essa abordagem com FUSE-Rust não apenas aproveita as capacidades avançadas de 
 
 1 - sudo mkdir /mnt/githubfs: Cria um diretório vazio chamado githubfs em /mnt, onde o sistema de arquivos GitHubFS pode ser montado novamente.
 
-2 - Cargo build : Compilar 
+2 - RUST_LOG=debug cargo build : Compilar 
 
-2 - ./target/debug/GitHubFS OWNER REPO: executar o binário GitHubFS compilado a partir do diretório target/debug/ com argumentos, para iniciar o seu sistema de arquivos GitHubFS com os parâmetros de usuário e nome do repositório.
+3 - RUST_LOG=debug ./target/debug/GitHubFS OWNER: executar o binário GitHubFS compilado a partir do diretório target/debug/ com argumentos, para iniciar o seu sistema de arquivos GitHubFS com os parâmetros de usuário.
 
 Caso funcione na primeira vez e na próximas não , tente:
 
@@ -45,4 +45,3 @@ sudo umount /mnt/githubfs: Desmonta o sistema de arquivos GitHubFS que estava mo
 sudo rm -rf /mnt/githubfs/: Remove recursivamente e força a remoção de todos os arquivos e diretórios dentro de /mnt/githubfs/.
 
 Agora tente novamente os passoas 1 , 2 e 3.
-

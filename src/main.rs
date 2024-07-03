@@ -1,7 +1,7 @@
 use clap::Parser;
 use fuser::MountOption;
-use log::debug;
-use std::io::{self};
+use log::{debug, error, info};
+use std::io::{self, Error, ErrorKind};
 use std::fs::create_dir_all;
 use std::path::PathBuf;
 
@@ -11,9 +11,6 @@ mod fs;
 struct Args {
     /// The owner of the GitHub repository.
     owner: String,
-
-    /// The name of the GitHub repository.
-    repo: String,
 
     /// The filesystem options.
     #[arg(short, long)]
@@ -31,17 +28,18 @@ fn main() -> io::Result<()> {
     env_logger::init();
     let args = Args::parse();
 
-    // Construct the mount point directory
-    let mountpoint = PathBuf::from("/mnt/githubfs"); // Substitute with your desired mount directory path
+    let mountpoint = PathBuf::from("/mnt/githubfs");
     ensure_mountpoint(&mountpoint)?;
 
-    // Example of where to store or how to obtain the GitHub access token
-    let github_token = "Your-Token".to_string(); // Substitute with your GitHub personal access token
+    let github_token = "Token".to_string();
 
-    let fs = fs::GitHubFS::new(
-        args.owner.clone(),
-        github_token,
-    );
+    let mut fs = fs::GitHubFS::new(args.owner.clone(), github_token)?;
+
+    // Load repositories at start
+    if let Err(e) = fs.fetch_repositories() {
+        error!("Error loading repositories: {:?}", e);
+        return Err(e);
+    }
 
     let mut options = Vec::new();
     for opt in &args.options {
@@ -78,7 +76,10 @@ fn main() -> io::Result<()> {
     debug!("Mounting filesystem at {:?}", mountpoint);
     match fuser::mount2(fs, &mountpoint, &options) {
         Ok(_) => println!("Filesystem mounted successfully"),
-        Err(e) => eprintln!("Failed to mount filesystem: {:?}", e),
+        Err(e) => {
+            error!("Failed to mount filesystem: {:?}", e);
+            return Err(e);
+        }
     };
 
     Ok(())
