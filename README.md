@@ -38,7 +38,7 @@ Essa abordagem com FUSE-Rust não apenas aproveita as capacidades avançadas de 
 
 3 - RUST_LOG=debug ./target/debug/GitHubFS OWNER: executar o binário GitHubFS compilado a partir do diretório target/debug/ com argumentos, para iniciar o seu sistema de arquivos GitHubFS com os parâmetros de usuário.
 
-Caso funcione na primeira vez e na próximas não , tente:
+Caso funcione na primeira vez e nas próximas não , tente:
 
 sudo umount /mnt/githubfs: Desmonta o sistema de arquivos GitHubFS que estava montado em /mnt/githubfs.
 
