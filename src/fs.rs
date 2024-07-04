@@ -58,9 +58,18 @@ impl GitHubFS {
 
         // Fetch and load repositories during initialization
         let repos = fs.fetch_repositories()?;
+        let mut repo_inodes = Vec::new();
         for (index, repo) in repos.into_iter().enumerate() {
             let inode = index as u64 + 2; // Inode starts from 2
             fs.repos.insert(inode, repo);
+            repo_inodes.push(inode);
+        }
+
+        // Load all repositories' root files
+        for &repo_inode in &repo_inodes {
+            if let Err(err) = fs.load_files(repo_inode, "") {
+                error!("Failed to load root directory files for inode {}: {}", repo_inode, err);
+            }
         }
 
         info!("Initialized with {} repositories", fs.repos.len());
@@ -166,21 +175,21 @@ impl GitHubFS {
                 })?;
             
             debug!("Fetched {} files", files.len());
-
-            // Carregar recursivamente diretórios
+    
+            let mut loaded_files = Vec::new();
+    
             for file in &files {
+                let inode = self.next_inode();
+                loaded_files.push((inode, file.clone()));
+    
                 if file.file_type == "dir" {
                     let sub_files = self.load_files(repo_id, &file.path)?;
-                    let new_inode = self.next_inode();
-                    self.files.insert(new_inode, sub_files);
+                    self.files.insert(inode, sub_files);
                 }
             }
     
-            // Insere os arquivos do diretório atual em self.files com inodes sequenciais
-            let current_inode = self.next_inode();
-            self.files.insert(current_inode, files.clone());
-    
-            Ok(files)
+            self.files.insert(repo_id, files.clone());
+            Ok(loaded_files.into_iter().map(|(_, file)| file).collect())
         } else {
             let status = response.status();
             let error_message = response.text().unwrap_or_else(|_| "No additional error message".to_string());
@@ -189,6 +198,8 @@ impl GitHubFS {
             Err(io::Error::new(io::ErrorKind::Other, full_error_message))
         }
     }
+    
+    
 
     fn attr(&self, ino: u64) -> io::Result<FileAttr> {
         let kind = if ino == 1 || self.repos.contains_key(&ino) {
@@ -274,39 +285,37 @@ impl Filesystem for GitHubFS {
         debug!("readdir(ino: {}, offset: {})", ino, offset);
     
         if offset != 0 {
-            debug!("Offset is not 0, returning ok");
             reply.ok();
             return;
         }
     
-        // Add "." and ".." entries for the directory
-        debug!("Adding . and .. entries");
         reply.add(ino, 1, FileType::Directory, ".");
         reply.add(ino, 2, FileType::Directory, "..");
     
         if ino == 1 {
-            debug!("Root directory, adding repositories");
-            for (i, repo) in self.repos.values().enumerate() {
-                debug!("Adding repo: {} with inode: {}", repo.name, (i + 3) as u64);
-                reply.add((i + 3) as u64, (i + 3) as i64, FileType::Directory, &repo.name);
+            for (inode, repo) in &self.repos {
+                reply.add(*inode, *inode as i64, FileType::Directory, &repo.name);
             }
         } else if let Some(files) = self.files.get(&ino) {
-            debug!("Adding files for directory with inode: {}", ino);
+            // Criar uma cópia dos arquivos para evitar problemas de mutabilidade
+            let files = files.clone();
+    
+            // Iterar sobre os arquivos sem a necessidade de mutar self.files diretamente
             for (i, file) in files.iter().enumerate() {
                 let kind = if file.file_type == "dir" { FileType::Directory } else { FileType::RegularFile };
-                debug!("Adding file: {} with inode: {}", file.name, (i + 3) as u64);
-                reply.add((i + 3) as u64, (i + 3) as i64, kind, &file.name);
+                let inode = self.next_inode();
+    
+                // Inserir o arquivo no HashMap usando uma nova entrada de vetor
+                self.files.insert(inode, vec![file.clone()]);
+    
+                // Adicionar a entrada ao reply
+                reply.add(inode, (i + 3) as i64, kind, &file.name);
             }
-        } else {
-            debug!("No files found for inode: {}", ino);
         }
     
         reply.ok();
     }
     
-    
-    
-
     fn read(
         &mut self,
         _req: &Request<'_>,
