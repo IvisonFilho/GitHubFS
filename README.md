@@ -31,6 +31,7 @@ Essa abordagem com FUSE-Rust não apenas aproveita as capacidades avançadas de 
 
 
 # RODAR:
+Obs.: Não esqueça de alterar o token na main.
 
 1 - sudo mkdir /mnt/githubfs: Cria um diretório vazio chamado githubfs em /mnt, onde o sistema de arquivos GitHubFS pode ser montado novamente.
 
@@ -41,7 +42,5 @@ Essa abordagem com FUSE-Rust não apenas aproveita as capacidades avançadas de 
 Caso funcione na primeira vez e nas próximas não , tente:
 
 sudo umount /mnt/githubfs: Desmonta o sistema de arquivos GitHubFS que estava montado em /mnt/githubfs.
-
-sudo rm -rf /mnt/githubfs/: Remove recursivamente e força a remoção de todos os arquivos e diretórios dentro de /mnt/githubfs/.
 
 Agora tente novamente os passoas 1 , 2 e 3.
