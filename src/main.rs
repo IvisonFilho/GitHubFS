@@ -31,11 +31,11 @@ fn main() -> io::Result<()> {
     let mountpoint = PathBuf::from("/mnt/githubfs");
     ensure_mountpoint(&mountpoint)?;
 
-    let github_token = "Token".to_string();
+    let github_token = "Seu token".to_string();
 
     let mut fs = fs::GitHubFS::new(args.owner.clone(), github_token)?;
 
-    // Load repositories at start
+    // Carrega repositórios no início
     if let Err(e) = fs.fetch_repositories() {
         error!("Error loading repositories: {:?}", e);
         return Err(e);

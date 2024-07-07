@@ -53,19 +53,19 @@ impl GitHubFS {
             token,
             repos: HashMap::new(),
             files: HashMap::new(),
-            next_inode: 2, // Start from 2 as 1 is reserved for root
+            next_inode: 2, // Comeca em 2, pois 1 é reservado para root
         };
 
-        // Fetch and load repositories during initialization
+        // Buscar e carregar repositórios durante a inicialização
         let repos = fs.fetch_repositories()?;
         let mut repo_inodes = Vec::new();
         for (index, repo) in repos.into_iter().enumerate() {
-            let inode = index as u64 + 2; // Inode starts from 2
+            let inode = index as u64 + 2; // Inode comeca em 2
             fs.repos.insert(inode, repo);
             repo_inodes.push(inode);
         }
 
-        // Load all repositories' root files
+        // Carrega os arquivos raiz de todos os repositórios
         for &repo_inode in &repo_inodes {
             if let Err(err) = fs.load_files(repo_inode, "") {
                 error!("Failed to load root directory files for inode {}: {}", repo_inode, err);
@@ -222,7 +222,7 @@ impl GitHubFS {
             uid: 0,
             gid: 0,
             rdev: 0,
-            blksize: 512, // Adicionando o campo blksize
+            blksize: 512, 
             flags: 0,
         })
     }
@@ -251,13 +251,13 @@ impl Filesystem for GitHubFS {
         debug!("lookup(parent: {}, name: {:?})", parent, name);
 
         if parent == 1 {
-            // Root directory, look for repositories
+            // Diretório raiz, procura pelo repositórios
             if let Some((&inode, _repo)) = self.repos.iter().find(|(_inode, repo)| OsStr::new(&repo.name) == name) {
                 reply.entry(&Duration::new(1, 0), &self.attr(inode).unwrap(), 0);
                 return;
             }
         } else {
-            // Look for files in repositories
+            // Procura arquivos em repositórios
             if let Some(files) = self.files.get(&parent) {
                 for file in files {
                     if OsStr::new(&file.name) == name {
@@ -297,18 +297,18 @@ impl Filesystem for GitHubFS {
                 reply.add(*inode, *inode as i64, FileType::Directory, &repo.name);
             }
         } else if let Some(files) = self.files.get(&ino) {
-            // Criar uma cópia dos arquivos para evitar problemas de mutabilidade
+            // Cria uma cópia dos arquivos para evitar problemas de mutabilidade
             let files = files.clone();
     
-            // Iterar sobre os arquivos sem a necessidade de mutar self.files diretamente
+            // Itera sobre os arquivos sem a necessidade de mutar self.files diretamente
             for (i, file) in files.iter().enumerate() {
                 let kind = if file.file_type == "dir" { FileType::Directory } else { FileType::RegularFile };
                 let inode = self.next_inode();
     
-                // Inserir o arquivo no HashMap usando uma nova entrada de vetor
+                // Insere o arquivo no HashMap usando uma nova entrada de vetor
                 self.files.insert(inode, vec![file.clone()]);
     
-                // Adicionar a entrada ao reply
+                // Adiciona a entrada ao reply
                 reply.add(inode, (i + 3) as i64, kind, &file.name);
             }
         }
