@@ -1,5 +1,6 @@
 # GitHubFS
-GitHubFS: Sistema de Arquivos em Modo Usuário com Crate FUSE para GitHub
+GitHubFS: Sistema de Arquivos em Modo Usuário com Crate FUSE para GitHub. 
+Projeto da disciplina de RUST.
 
 # About
 
